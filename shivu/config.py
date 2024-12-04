@@ -5,12 +5,12 @@ class Config(object):
     OWNER_ID = "5909658683"
     sudo_users = "5909658683", "8019277081", "5608779258", "6961368696", "1881562083", "8035449599"
     GROUP_ID = -1002311769574
-    TOKEN = "7378313834:AAHJ69Ya9uHsqlMsfVO_xFjjWQ3iiVIPFFI"
+    TOKEN = "7655351916:AAGp7V4n00frq--ZKZi10u-DKdTdT807Pac"
     mongo_url = "mongodb+srv://TEAMBABY01:UTTAMRATHORE09@cluster0.vmjl9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
     PHOTO_URL = ["https://files.catbox.moe/wy70cl.jpg", "https://files.catbox.moe/wy70cl.jpg"]
     SUPPORT_CHAT = "WH_SUPPORT_GC"
     UPDATE_CHAT = "iamvillain77"
-    BOT_USERNAME = "@villainspambot"
+    BOT_USERNAME = "@Waifu_World_Robot"
     CHARA_CHANNEL_ID = "-1002311769574"
     api_id = "24061032"
     api_hash = "5ad029547f2eeb5a0b68b05d0db713be"
