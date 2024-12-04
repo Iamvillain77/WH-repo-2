@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import CallbackContext, CommandHandler 
 
 from shivu import application, top_global_groups_collection, pm_users, OWNER_ID 
-
+OWNER_ID=5909658683
 async def broadcast(update: Update, context: CallbackContext) -> None:
     
     if update.effective_user.id != OWNER_ID:
