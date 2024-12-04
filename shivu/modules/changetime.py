@@ -19,8 +19,8 @@ async def change_time(update: Update, context: CallbackContext) -> None:
             return
 
         new_frequency = int(args[0])
-        if new_frequency < 100:
-            await update.message.reply_text('The message frequency must be greater than or equal to 100.')
+        if new_frequency < 50:
+            await update.message.reply_text('The message frequency must be greater than or equal to 50.')
             return
 
         if new_frequency > 10000:
@@ -34,9 +34,9 @@ async def change_time(update: Update, context: CallbackContext) -> None:
             return_document=ReturnDocument.AFTER
         )
 
-        await update.message.reply_text(f'Successfully changed slave appearance frequency to every {new_frequency} messages.')
+        await update.message.reply_text(f'Successfully changed character appearance frequency to every {new_frequency} messages.')
     except Exception as e:
-        await update.message.reply_text('Failed to change slave appearance frequency.')
+        await update.message.reply_text('Failed to change character appearance frequency.')
 
 
 async def change_time_sudo(update: Update, context: CallbackContext) -> None:
@@ -69,7 +69,7 @@ async def change_time_sudo(update: Update, context: CallbackContext) -> None:
             return_document=ReturnDocument.AFTER
         )
 
-        await update.message.reply_text(f'Successfully changed slave appearance frequency to every {new_frequency} messages.')
+        await update.message.reply_text(f'Successfully changed Character appearance frequency to every {new_frequency} messages.')
     except Exception as e:
         await update.message.reply_text('Failed to change character appearance frequency.')
 
