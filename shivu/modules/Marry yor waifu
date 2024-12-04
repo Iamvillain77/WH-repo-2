@@ -1,0 +1,33 @@
+Here's the updated code with the new bot token:
+
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, CallbackContext
+
+# Define the command handler for /marry
+def marry_command(update: Update, context: CallbackContext):
+    user = update.message.from_user
+    bot_name = "Waifu_World_Robot"
+
+    # Check if the command is directed at the bot
+    if context.args and context.args[0] == f"@{bot_name}":
+        update.message.reply_text(f"💍 Congratulations, {user.first_name}! You've proposed to {bot_name}.")
+    else:
+        update.message.reply_text("You need to tag me (@Waifu_World_Robot) to use this command properly!")
+
+def main():
+    # Use the updated bot token
+    updater = Updater("7655351916:AAGp7V4n00frq--ZKZi10u-DKdTdT807Pac")
+
+    # Get the dispatcher to register handlers
+    dispatcher = updater.dispatcher
+
+    # Register the /marry command
+    dispatcher.add_handler(CommandHandler("marry", marry_command, pass_args=True))
+
+    # Start the bot
+    updater.start_polling()
+    print("Bot is running... Press Ctrl+C to stop.")
+    updater.idle()
+
+if name == "main":
+    main()
