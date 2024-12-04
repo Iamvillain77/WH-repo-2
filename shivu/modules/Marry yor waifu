@@ -1,5 +1,3 @@
-Here's the updated code with the new bot token:
-
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
 
