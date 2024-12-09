@@ -5,8 +5,8 @@ class Config(object):
     OWNER_ID = "5909658683"
     sudo_users = "5909658683", "8019277081", "5608779258", "6961368696", "1881562083", "8035449599", "7430528632"
     GROUP_ID = -1002311769574
-    TOKEN = "7655351916:AAG5p2KxTldZzXIvrZJ5F8TOmHC8XuexjP4"
-    mongo_url = "mongodb+srv://Villainmusic01:deathnote0p@cluster0.nah8e.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    TOKEN = "76553519"
+    mongo_url = ""
     PHOTO_URL = ["https://files.catbox.moe/wy70cl.jpg", "https://files.catbox.moe/wy70cl.jpg"]
     SUPPORT_CHAT = "WH_SUPPORT_GC"
     UPDATE_CHAT = "iamvillain77"
