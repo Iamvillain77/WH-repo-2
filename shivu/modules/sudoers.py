@@ -1,7 +1,6 @@
 from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from pyrogram.types import Message
-from shivu import app
 from pyrogram.types import InputMediaVideo
 from shivu.misc import SUDOERS
 from shivu.utils.database import add_sudo, remove_sudo
