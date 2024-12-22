@@ -1,83 +1,43 @@
-import logging
-from telegram import Update
-from telegram.ext import CommandHandler, CallbackContext
-from shivu import application
-from config import SUDO_USERS, OWNER_ID  # Assuming OWNER_ID and SUDO_USERS are imported from config.py
+import logging  
+import os
+from pyrogram import Client 
+from telegram.ext import Application
+from motor.motor_asyncio import AsyncIOMotorClient
 
-# Logging to track errors
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+    handlers=[logging.FileHandler("log.txt"), logging.StreamHandler()],
+    level=logging.INFO,
+)
 
-# /addsudo command
-async def add_sudo(update: Update, context: CallbackContext) -> None:
-    """Command to add a new sudo user."""
-    user_id = update.effective_user.id
+logging.getLogger("apscheduler").setLevel(logging.ERROR)
+logging.getLogger('httpx').setLevel(logging.WARNING)
+logging.getLogger("pyrate_limiter").setLevel(logging.ERROR)
+LOGGER = logging.getLogger(__name__)
 
-    # Check if the user is the owner or a sudo user
-    if user_id not in SUDO_USERS and user_id != OWNER_ID:
-        await update.message.reply_text("You do not have permission to add sudo users.")
-        return
+from shivu.config import Development as Config
 
-    # Make sure a user ID is provided
-    if not context.args:
-        await update.message.reply_text("Please provide the user ID to add as sudo.")
-        return
 
-    new_sudo_user_id = context.args[0]
+api_id = Config.api_id
+api_hash = Config.api_hash
+TOKEN = Config.TOKEN
+GROUP_ID = Config.GROUP_ID
+CHARA_CHANNEL_ID = Config.CHARA_CHANNEL_ID 
+mongo_url = Config.mongo_url 
+PHOTO_URL = Config.PHOTO_URL 
+SUPPORT_CHAT = Config.SUPPORT_CHAT 
+UPDATE_CHAT = Config.UPDATE_CHAT
+BOT_USERNAME = Config.BOT_USERNAME 
+sudo_users = Config.sudo_users
+OWNER_ID = Config.OWNER_ID 
 
-    # Check if the provided user ID is already a sudo user
-    if new_sudo_user_id in SUDO_USERS:
-        await update.message.reply_text(f"User {new_sudo_user_id} is already a sudo user.")
-        return
-
-    # Add the new user to the sudo users list
-    SUDO_USERS.append(new_sudo_user_id)
-
-    # Update the config file or wherever sudo users are stored
-    try:
-        with open("config.py", "a") as config_file:
-            config_file.write(f'\nSUDO_USERS = {SUDO_USERS}')
-        
-        await update.message.reply_text(f"User {new_sudo_user_id} has been added as a sudo user!")
-    except Exception as e:
-        logger.error(f"Error updating sudo users: {e}")
-        await update.message.reply_text("Failed to add the user as sudo. Please try again later.")
-
-# /unsudo command
-async def unsudo(update: Update, context: CallbackContext) -> None:
-    """Command to remove a sudo user."""
-    user_id = update.effective_user.id
-
-    # Check if the user is the owner or a sudo user
-    if user_id not in SUDO_USERS and user_id != OWNER_ID:
-        await update.message.reply_text("You do not have permission to remove sudo users.")
-        return
-
-    # Make sure a user ID is provided
-    if not context.args:
-        await update.message.reply_text("Please provide the user ID to remove from sudo.")
-        return
-
-    unsudo_user_id = context.args[0]
-
-    # Check if the provided user ID is a sudo user
-    if unsudo_user_id not in SUDO_USERS:
-        await update.message.reply_text(f"User {unsudo_user_id} is not a sudo user.")
-        return
-
-    # Remove the user from the sudo users list
-    SUDO_USERS.remove(unsudo_user_id)
-
-    # Update the config file or wherever sudo users are stored
-    try:
-        with open("config.py", "w") as config_file:
-            config_file.write(f'SUDO_USERS = {SUDO_USERS}')
-        
-        await update.message.reply_text(f"User {unsudo_user_id} has been removed from sudo users.")
-    except Exception as e:
-        logger.error(f"Error updating sudo users: {e}")
-        await update.message.reply_text("Failed to remove the user as sudo. Please try again later.")
-
-# Add the command handlers for /addsudo and /unsudo
-application.add_handler(CommandHandler("addsudo", add_sudo))
-application.add_handler(CommandHandler("unsudo", unsudo))
+application = Application.builder().token(TOKEN).build()
+shivuu = Client("Shivu", api_id, api_hash, bot_token=TOKEN)
+lol = AsyncIOMotorClient(mongo_url)
+db = lol['Character_catcher']
+collection = db['anime_characters_lol']
+user_totals_collection = db['user_totals_lmaoooo']
+user_collection = db["user_collection_lmaoooo"]
+group_user_totals_collection = db['group_user_totalsssssss']
+top_global_groups_collection = db['top_global_groups']
+pm_users = db['total_pm_users']
