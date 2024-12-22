@@ -2,13 +2,13 @@ from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from pyrogram.types import Message
 from strings import get_string, helpers
-from SONALI import app
+from Shivu import app
 from pyrogram.types import InputMediaVideo
-from SONALI.misc import SUDOERS
-from SONALI.utils.database import add_sudo, remove_sudo
-from SONALI.utils.decorators.language import language
-from SONALI.utils.extraction import extract_user
-from SONALI.utils.inline import close_markup
+from Shivu.misc import SUDOERS
+from Shivu.utils.database import add_sudo, remove_sudo
+from Shivu.utils.decorators.language import language
+from Shivu.utils.extraction import extract_user
+from Shivu.utils.inline import close_markup
 from config import BANNED_USERS, OWNER_ID
 
 
