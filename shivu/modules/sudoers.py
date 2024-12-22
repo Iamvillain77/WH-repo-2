@@ -1,111 +1,83 @@
-from pyrogram import filters
-from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
-from pyrogram.types import Message
-from pyrogram.types import InputMediaVideo
-from shivu.misc import SUDOERS
-from shivu.utils.database import add_sudo, remove_sudo
-from shivu.utils.decorators.language import language
-from shivu.utils.extraction import extract_user
-from shivu.utils.inline import close_markup
-from config import BANNED_USERS, OWNER_ID
+import logging
+from telegram import Update
+from telegram.ext import CommandHandler, CallbackContext
+from shivu import application
+from config import SUDO_USERS, OWNER_ID  # Assuming OWNER_ID and SUDO_USERS are imported from config.py
 
+# Logging to track errors
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
+# /addsudo command
+async def add_sudo(update: Update, context: CallbackContext) -> None:
+    """Command to add a new sudo user."""
+    user_id = update.effective_user.id
 
-@app.on_message(filters.command(["addsudo"], prefixes=["/", "!", "%", ",", "", ".", "@", "#"]) & filters.user(OWNER_ID))
-@language
-async def useradd(client, message: Message, _):
-    if not message.reply_to_message:
-        if len(message.command) != 2:
-            return await message.reply_text(_["general_1"])
-    user = await extract_user(message)
-    if user.id in SUDOERS:
-        return await message.reply_text(_["sudo_1"].format(user.mention))
-    added = await add_sudo(user.id)
-    if added:
-        SUDOERS.add(user.id)
-        await message.reply_text(_["sudo_2"].format(user.mention))
-    else:
-        await message.reply_text(_["sudo_8"])
+    # Check if the user is the owner or a sudo user
+    if user_id not in SUDO_USERS and user_id != OWNER_ID:
+        await update.message.reply_text("You do not have permission to add sudo users.")
+        return
 
+    # Make sure a user ID is provided
+    if not context.args:
+        await update.message.reply_text("Please provide the user ID to add as sudo.")
+        return
 
-@app.on_message(filters.command(["delsudo", "rmsudo"], prefixes=["/", "!", "%", ",", "", ".", "@", "#"]) & filters.user(OWNER_ID))
-@language
-async def userdel(client, message: Message, _):
-    if not message.reply_to_message:
-        if len(message.command) != 2:
-            return await message.reply_text(_["general_1"])
-    user = await extract_user(message)
-    if user.id not in SUDOERS:
-        return await message.reply_text(_["sudo_3"].format(user.mention))
-    removed = await remove_sudo(user.id)
-    if removed:
-        SUDOERS.remove(user.id)
-        await message.reply_text(_["sudo_4"].format(user.mention))
-    else:
-        await message.reply_text(_["sudo_8"])
+    new_sudo_user_id = context.args[0]
 
+    # Check if the provided user ID is already a sudo user
+    if new_sudo_user_id in SUDO_USERS:
+        await update.message.reply_text(f"User {new_sudo_user_id} is already a sudo user.")
+        return
 
+    # Add the new user to the sudo users list
+    SUDO_USERS.append(new_sudo_user_id)
 
-@app.on_message(filters.command(["sudolist", "listsudo", "sudoers"], prefixes=["/", "!", "%", ",", "", ".", "@", "#"]) & ~BANNED_USERS)
-async def sudoers_list(client, message: Message):
-    keyboard = [[InlineKeyboardButton("๏ ᴠɪᴇᴡ sᴜᴅᴏʟɪsᴛ ๏", callback_data="check_sudo_list")]]
-    reply_markups = InlineKeyboardMarkup(keyboard)
-  
-    #await message.reply_photo(photo="https://telegra.ph/file/4e89ccb36bde6833e9ed0.mp4", caption="**» ᴄʜᴇᴄᴋ sᴜᴅᴏ ʟɪsᴛ ʙʏ ɢɪᴠᴇɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ.**\n\n**» ɴᴏᴛᴇ:**  ᴏɴʟʏ sᴜᴅᴏ ᴜsᴇʀs ᴄᴀɴ ᴠɪᴇᴡ. ", reply_markup=reply_markups)
-    await message.reply_video(video="https://files.catbox.moe/8xyq9z.jpg", caption="**» ᴄʜᴇᴄᴋ sᴜᴅᴏ ʟɪsᴛ ʙʏ ɢɪᴠᴇɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ.**\n\n**» ɴᴏᴛᴇ:**  ᴏɴʟʏ sᴜᴅᴏ ᴜsᴇʀs ᴄᴀɴ ᴠɪᴇᴡ. ", reply_markup=reply_markups)
-    
-
-@app.on_callback_query(filters.regex("^check_sudo_list$"))
-async def check_sudo_list(client, callback_query: CallbackQuery):
-    keyboard = []
-    if callback_query.from_user.id not in SUDOERS:
-        return await callback_query.answer(" ꪜ 𝛊 ɭ ɭ ᧘ 𝛊 𝛈 ᴋᴀ 𝗟ᴜɴᴅ 𝗟ᴇɢᴀ 😂 \n 𝗦ᴜᴅᴏʟɪsᴛ 𝗗ᴇᴋʜɴᴇ ᴀᴀʏᴀ ᴍᴄ 🤧🖕", show_alert=True)
-    else:
-        user = await app.get_users(OWNER_ID)
-
-        user_mention = (user.first_name if not user.mention else user.mention)
-        caption = f"**˹ʟɪsᴛ ᴏғ ʙᴏᴛ ᴍᴏᴅᴇʀᴀᴛᴏʀs˼**\n\n**🌹Oᴡɴᴇʀ** ➥ {user_mention}\n\n"
-
-        keyboard.append([InlineKeyboardButton("๏ ᴠɪᴇᴡ ᴏᴡɴᴇʀ ๏", url=f"tg://openmessage?user_id={OWNER_ID}")])
+    # Update the config file or wherever sudo users are stored
+    try:
+        with open("config.py", "a") as config_file:
+            config_file.write(f'\nSUDO_USERS = {SUDO_USERS}')
         
-        count = 1
-        for user_id in SUDOERS:
-            if user_id != OWNER_ID:
-                try:
-                    user = await app.get_users(user_id)
-                    user_mention = user.mention if user else f"**🎁 Sᴜᴅᴏ {count} ɪᴅ:** {user_id}"
-                    caption += f"**🎁 Sᴜᴅᴏ** {count} **»** {user_mention}\n"
-                    button_text = f"๏ ᴠɪᴇᴡ sᴜᴅᴏ {count} ๏ "
-                    keyboard.append([InlineKeyboardButton(button_text, url=f"tg://openmessage?user_id={user_id}")]
-                    )
-                    count += 1
-                except:
-                    continue
+        await update.message.reply_text(f"User {new_sudo_user_id} has been added as a sudo user!")
+    except Exception as e:
+        logger.error(f"Error updating sudo users: {e}")
+        await update.message.reply_text("Failed to add the user as sudo. Please try again later.")
 
-        # Add a "Back" button at the end
-        keyboard.append([InlineKeyboardButton("๏ ʙᴀᴄᴋ ๏", callback_data="back_to_main_menu")])
+# /unsudo command
+async def unsudo(update: Update, context: CallbackContext) -> None:
+    """Command to remove a sudo user."""
+    user_id = update.effective_user.id
 
-        if keyboard:
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            await callback_query.message.edit_caption(caption=caption, reply_markup=reply_markup)
+    # Check if the user is the owner or a sudo user
+    if user_id not in SUDO_USERS and user_id != OWNER_ID:
+        await update.message.reply_text("You do not have permission to remove sudo users.")
+        return
 
-@app.on_callback_query(filters.regex("^back_to_main_menu$"))
-async def back_to_main_menu(client, callback_query: CallbackQuery):
-    keyboard = [[InlineKeyboardButton("๏ ᴠɪᴇᴡ sᴜᴅᴏʟɪsᴛ ๏", callback_data="check_sudo_list")]]
-    reply_markupes = InlineKeyboardMarkup(keyboard)
-    await callback_query.message.edit_caption(caption="**» ᴄʜᴇᴄᴋ sᴜᴅᴏ ʟɪsᴛ ʙʏ ɢɪᴠᴇɴ ʙᴇʟᴏᴡ ʙᴜᴛᴛᴏɴ.**\n\n**» ɴᴏᴛᴇ:**  ᴏɴʟʏ sᴜᴅᴏ ᴜsᴇʀs ᴄᴀɴ ᴠɪᴇᴡ. ", reply_markup=reply_markupes)
+    # Make sure a user ID is provided
+    if not context.args:
+        await update.message.reply_text("Please provide the user ID to remove from sudo.")
+        return
 
+    unsudo_user_id = context.args[0]
 
+    # Check if the provided user ID is a sudo user
+    if unsudo_user_id not in SUDO_USERS:
+        await update.message.reply_text(f"User {unsudo_user_id} is not a sudo user.")
+        return
 
+    # Remove the user from the sudo users list
+    SUDO_USERS.remove(unsudo_user_id)
 
-@app.on_message(filters.command(["delallsudo"], prefixes=["/", "!", "%", ",", "", ".", "@", "#"]) & filters.user(OWNER_ID))
-@language
-async def del_all_sudo(client, message: Message, _):
-    count = len(SUDOERS) - 1  # Exclude the admin from the count
-    for user_id in SUDOERS.copy():
-        if user_id != OWNER_ID:
-            removed = await remove_sudo(user_id)
-            if removed:
-                SUDOERS.remove(user_id)
-                count -= 1
-    await message.reply_text(f"Removed {count} users from the sudo list.")
+    # Update the config file or wherever sudo users are stored
+    try:
+        with open("config.py", "w") as config_file:
+            config_file.write(f'SUDO_USERS = {SUDO_USERS}')
+        
+        await update.message.reply_text(f"User {unsudo_user_id} has been removed from sudo users.")
+    except Exception as e:
+        logger.error(f"Error updating sudo users: {e}")
+        await update.message.reply_text("Failed to remove the user as sudo. Please try again later.")
+
+# Add the command handlers for /addsudo and /unsudo
+application.add_handler(CommandHandler("addsudo", add_sudo))
+application.add_handler(CommandHandler("unsudo", unsudo))
