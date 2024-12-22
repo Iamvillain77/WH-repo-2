@@ -2,7 +2,6 @@ import logging
 from telegram import Update
 from telegram.ext import CommandHandler, CallbackContext
 from shivu import application
-from shivu import SUDO_USERS, OWNER_ID  # Assuming OWNER_ID and SUDO_USERS are imported from config.py
 
 # Logging to track errors
 logging.basicConfig(level=logging.INFO)
